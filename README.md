@@ -81,7 +81,6 @@ Some things that would be nice to have at some point.
 
 * use hdiutil to mount/attach the disk image
 * automatically detect the `volumes_dir` where the image is attached
-* be able to automatically accept license agreements
 * install software that is a .pkg inside a .dmg instead of just .app's
 
 License and Author
