@@ -43,12 +43,29 @@ action :install do
       not_if "hdiutil info | grep -q 'image-path.*#{dmg_file}'"
     end
 
-    execute "cp -r '/Volumes/#{volumes_dir}/#{new_resource.app}.app' '#{new_resource.destination}'"
+		if new_resource.package
+			# dmg w/pkg
+			package_extension = "pkg"
+			pkg_root = "/Volumes/#{volumes_dir}"
+			available_packages = Dir["#{pkg_root}/**/*#{package_extension}"]
+			Chef::Log.debug("DMG package root: #{pkg_root}")
+			Chef::Log.debug("DMG available packages:  #{available_packages.join(', ')}")
+			target_package = available_packages.detect do |package_filename| 
+				::File.basename(package_filename) == new_resource.package
+			end
+
+			raise "#{new_resource.package} not among available packages #{available_packages.join(', ')}" unless target_package
+			package_path = ::File.expand_path(target_package)
+			Chef::Log.debug("Installing #{package_path}")
+			execute "installer -pkg #{package_path} -target '/' "
+		else
+			#dmg w/ .app
+			execute "cp -r '/Volumes/#{volumes_dir}/#{new_resource.app}.app' '#{new_resource.destination}'"
+
+			file "#{new_resource.destination}/#{new_resource.app}.app/Contents/MacOS/#{new_resource.app}" do
+				mode 0755
+			end
+		end
     execute "hdiutil detach '/Volumes/#{volumes_dir}'"
-
-    file "#{new_resource.destination}/#{new_resource.app}.app/Contents/MacOS/#{new_resource.app}" do
-      mode 0755
-    end
-
   end
 end
