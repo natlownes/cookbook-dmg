@@ -34,6 +34,7 @@ action :install do
 
     if new_resource.source
       remote_file dmg_file do
+				Chef::Log.debug("source:  #{new_resource.source}")
         source new_resource.source
         checksum new_resource.checksum if new_resource.checksum
       end
@@ -57,7 +58,7 @@ action :install do
 			raise "#{new_resource.package} not among available packages #{available_packages.join(', ')}" unless target_package
 			package_path = ::File.expand_path(target_package)
 			Chef::Log.debug("Installing #{package_path}")
-			execute "installer -pkg #{package_path} -target '/' "
+			execute "installer -pkg '#{package_path}' -target '/' -verbose "
 		else
 			#dmg w/ .app
 			execute "cp -r '/Volumes/#{volumes_dir}/#{new_resource.app}.app' '#{new_resource.destination}'"
