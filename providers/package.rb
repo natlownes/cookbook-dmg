@@ -40,7 +40,7 @@ action :install do
       end
     end
 
-    execute "hdid #{dmg_file}" do
+    execute "hdid '#{dmg_file}'" do
       not_if "hdiutil info | grep -q 'image-path.*#{dmg_file}'"
     end
 
@@ -61,7 +61,7 @@ action :install do
 			execute "installer -pkg '#{package_path}' -target '/' -verbose "
 		else
 			#dmg w/ .app
-			execute "cp -r '/Volumes/#{volumes_dir}/#{new_resource.app}.app' '#{new_resource.destination}'"
+			execute "cp -R '/Volumes/#{volumes_dir}/#{new_resource.app}.app' '#{new_resource.destination}'"
 
 			file "#{new_resource.destination}/#{new_resource.app}.app/Contents/MacOS/#{new_resource.app}" do
 				mode 0755
